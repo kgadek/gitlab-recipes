@@ -269,7 +269,8 @@ sudo -u git -H bundle exec rake gitlab:setup RAILS_ENV=production GITLAB_ROOT_PA
 Download the FreeBSD init script as root:
 
 ```
-wget -O /usr/local/etc/rc.d/gitlab https://gitlab.com/gitlab-org/gitlab-recipes/raw/master/init/init/freebsd/gitlab-unicorn
+curl -o /usr/local/etc/rc.d/gitlab https://raw.githubusercontent.com/gitlabhq/gitlab-recipes/d6a08baf7e0cbcecbecf46252f66e2822f4110f7/init/init/freebsd/gitlab-unicorn
+chmod +x /usr/local/etc/rc.d/gitlab
 ```
 
 10. Check Configuration and Compile Assets
@@ -299,6 +300,8 @@ As root:
 service gitlab start
 ```
 
+**NOTE:** If you're trying to run PostgreSQL in multiple FreeBSD jails, you need to ensure that UIDs of `pgsql` are different across jails. To change the UID to - e.g. `71`, perform as root: `service postgresql stop && pw usermod pgsql -u 71 && chown -R pgsql /usr/local/pgsql && service postgresql start`
+
 12. Nginx
 ---------
 
@@ -306,11 +309,11 @@ service gitlab start
 `gzip_static` module, which means you need to remove the appropriate directives
 from the `nginx` configuration.
 
-You might want to create `/usr/local/etc/nginx/conf.d/` and include it in
+You might want to create `/usr/local/etc/nginx/conf.d/` and `/var/log/nginx`, and include the former in
 `nginx.conf` first.
 
 ```
-wget -O /usr/local/etc/nginx/conf.d/gitlab.conf https://gitlab.com/gitlab-org/gitlab-ce/raw/master/lib/support/nginx/gitlab-ssl
+curl -o /usr/local/etc/nginx/conf.d/gitlab.conf https://gitlab.com/gitlab-org/gitlab-ce/raw/master/lib/support/nginx/gitlab-ssl
 ```
 
 Edit `/usr/local/etc/nginx/conf.d/gitlab.conf` and replace `git.example.com` with your FQDN. Make sure to read the comments in order to properly set up SSL.
